@@ -1,141 +1,210 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { EmptyState } from "@/components/ui/empty-state"
 import Link from "next/link"
 
-const statusTabs = ["전체", "진행중", "완료", "보류"]
+type TabType = "new" | "progress" | "completed"
 
-const requests = [
-  {
-    id: 1,
-    type: "car",
-    typeLabel: "자동차",
-    location: "서울시 강남구",
-    status: "진행중",
-    progress: 60,
-  },
-  {
-    id: 2,
-    type: "medical",
-    typeLabel: "실손",
-    location: "경기도 성남시",
-    status: "진행중",
-    progress: 30,
-  },
-  {
-    id: 3,
-    type: "fire",
-    typeLabel: "화재",
-    location: "인천시 남동구",
-    status: "완료",
-    progress: 100,
-  },
-]
+const sampleRequests = {
+  new: [],
+  progress: [
+    {
+      id: 1,
+      type: "자동차 사고",
+      status: "상담 중",
+      date: "2024-01-15",
+      estimatedAmount: "500만원",
+    },
+    {
+      id: 2,
+      type: "실손보험",
+      status: "계약 완료",
+      date: "2024-01-10",
+      estimatedAmount: "1,200만원",
+    },
+  ],
+  completed: [
+    {
+      id: 3,
+      type: "화재 보험",
+      status: "완료",
+      date: "2023-12-20",
+      finalAmount: "800만원",
+      increaseRate: "150%",
+    },
+  ],
+}
 
 export default function RequestsPage() {
-  const [activeTab, setActiveTab] = useState("전체")
+  const router = useRouter()
+  const [activeTab, setActiveTab] = useState<TabType>("new")
 
-  const filteredRequests =
-    activeTab === "전체"
-      ? requests
-      : requests.filter((req) => req.status === activeTab)
+  const handleNewRequest = () => {
+    const token = localStorage.getItem("auth_token")
+    if (!token) {
+      if (confirm("의뢰를 신청하려면 로그인해주세요.")) {
+        router.push("/login")
+      }
+      return
+    }
+    router.push("/requests/new")
+  }
 
   return (
-    <main className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-20">
       {/* 헤더 */}
       <header className="sticky top-0 z-40 bg-card border-b border-border safe-area-top">
         <div className="max-w-md mx-auto px-4 py-3">
-          <h1 className="text-title font-bold text-foreground">의뢰 관리</h1>
+          <h1 className="text-title font-bold text-foreground">의뢰</h1>
         </div>
       </header>
 
-      {/* 상태 탭 */}
-      <div className="sticky top-[57px] z-30 bg-card border-b border-border">
-        <div className="max-w-md mx-auto px-4">
-          <div className="flex items-center gap-2 overflow-x-auto pb-2">
-            {statusTabs.map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-                  activeTab === tab
-                    ? "bg-primary-500 text-white"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
+      {/* 탭 */}
+      <div className="max-w-md mx-auto border-b border-border">
+        <div className="flex">
+          {[
+            { id: "new" as TabType, label: "신청하기" },
+            { id: "progress" as TabType, label: "진행 중" },
+            { id: "completed" as TabType, label: "완료" },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 py-3 text-center text-sm font-medium border-b-2 transition-colors ${
+                activeTab === tab.id
+                  ? "border-primary-500 text-primary-500"
+                  : "border-transparent text-muted-foreground"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* 의뢰 목록 */}
-      <div className="max-w-md mx-auto px-4 py-4 space-y-3">
-        {filteredRequests.length === 0 ? (
-          <EmptyState
-            title="의뢰가 없습니다"
-            description="새로운 의뢰를 수락하면 여기에 표시됩니다"
-          />
-        ) : (
-          filteredRequests.map((request) => (
-            <Link key={request.id} href={`/requests/${request.id}`} className="block"> {/* ← className="block" 추가 */}
-              <Card className="hover:shadow-md transition-shadow">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <Badge variant={request.type as any}>
-                        {request.typeLabel}
-                      </Badge>
-                      <Badge
-                        variant={
-                          request.status === "완료"
-                            ? "success"
-                            : request.status === "보류"
-                            ? "warning"
-                            : "default"
-                        }
-                      >
-                        {request.status}
-                      </Badge>
-                    </div>
-                  </div>
+{/* 컨텐츠 영역 */}
+<div className="max-w-md mx-auto px-4 flex flex-col min-h-[calc(100vh-120px)]"> 
+  {/* flex flex-col: 수직 구조 생성
+      min-h-[calc(100vh-120px)]: 화면 전체 높이에서 탭 높이를 뺀 만큼 차지하여 중앙 정렬 기반 마련
+  */}
+  
+  {activeTab === "new" && (
+    <div className="flex-1 flex flex-col justify-center py-12"> 
+      {/* flex-1: 남은 공간을 다 차지함
+          justify-center: 세로 방향 중앙 정렬
+          py-12: 상하단에 넉넉한 여백(약 48px) 추가
+      */}
+      <Card className="shadow-sm border-gray-100">
+        <CardContent className="p-10 min-h-[220px] flex flex-col justify-start pt-8 text-center">
+          <h2 className="text-xl font-semibold mb-4 leading-tight">
+            간편한 의뢰 신청으로<br />
+            손해사정사에게 직접 연결하세요
+          </h2>
+          <Button onClick={handleNewRequest} className="w-full h-14 text-lg font-medium mb-4">
+            의뢰 신청하기
+          </Button>
+          <p className="text-sm text-muted-foreground">
+            약 5분이면 완료됩니다
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  )}
 
-                  <div className="space-y-2 mb-3">
-                    <div className="text-body text-foreground">
-                      📍 {request.location}
-                    </div>
-                    {request.status === "진행중" && (
-                      <div>
-                        <div className="flex items-center justify-between text-sm mb-1">
-                          <span className="text-muted-foreground">진행률</span>
-                          <span className="text-foreground font-medium">
-                            {request.progress}%
-                          </span>
+
+        {activeTab === "progress" && (
+          <div className="space-y-5">
+            {sampleRequests.progress.length === 0 ? (
+              <EmptyState
+                title="진행 중인 의뢰가 없습니다"
+                description="새로운 의뢰를 신청해보세요"
+              />
+            ) : (
+              sampleRequests.progress.map((request) => (
+                <Link key={request.id} href={`/requests/${request.id}`}>
+                  <Card>
+                    <CardContent className="p-6 min-h-[140px] flex flex-col justify-start pt-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div>
+                          <h3 className="font-semibold text-foreground mb-2">
+                            {request.type}
+                          </h3>
+                          <Badge
+                            variant={
+                              request.status === "계약 완료" ? "success" : "warning"
+                            }
+                            className="text-xs"
+                          >
+                            {request.status}
+                          </Badge>
                         </div>
-                        <div className="w-full bg-muted rounded-full h-2">
-                          <div
-                            className="bg-primary-500 h-2 rounded-full transition-all"
-                            style={{ width: `${request.progress}%` }}
-                          />
-                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {request.date}
+                        </span>
                       </div>
-                    )}
-                  </div>
+                      <div className="text-sm text-muted-foreground mb-4">
+                        예상 보상액: {request.estimatedAmount}
+                      </div>
+                      {request.status === "계약 완료" && (
+                        <Button variant="outline" className="w-full" size="sm">
+                          전자계약서 확인
+                        </Button>
+                      )}
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))
+            )}
+          </div>
+        )}
 
-                  <Button variant="outline" className="w-full">
-                    상세보기
-                  </Button>
-                </CardContent>
-              </Card>
-            </Link>
-          ))
+        {activeTab === "completed" && (
+          <div className="space-y-5">
+            {sampleRequests.completed.length === 0 ? (
+              <EmptyState
+                title="완료된 의뢰가 없습니다"
+                description="의뢰를 신청하고 진행해보세요"
+              />
+            ) : (
+              sampleRequests.completed.map((request) => (
+                <Card key={request.id}>
+                  <CardContent className="p-6 min-h-[140px] flex flex-col justify-start pt-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h3 className="font-semibold text-foreground mb-2">
+                          {request.type}
+                        </h3>
+                        <Badge variant="success" className="text-xs">
+                          {request.status}
+                        </Badge>
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {request.date}
+                      </span>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="text-sm">
+                        <span className="text-muted-foreground">최종 보상액: </span>
+                        <span className="font-bold text-success">
+                          {request.finalAmount}
+                        </span>
+                      </div>
+                      <div className="text-xs text-primary-500">
+                        증액률: ↑ {request.increaseRate}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
         )}
       </div>
-    </main>
+    </div>
   )
 }

@@ -15,13 +15,14 @@ module.exports = {
           200: '#bfdbfe',
           300: '#93c5fd',
           400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
+          500: '#2563eb', // 더 깊고 차분한 블루 (기본 Primary)
+          600: '#1d4ed8',
+          700: '#1e40af',
+          800: '#1e3a8a',
           900: '#1e3a8a',
         },
-        success: '#10b981',
+        success: '#059669', // 매우 제한적 사용
+        accentGreen: '#16A34A', // 소프트·신뢰감 있는 그린 (증액률, 성공 뱃지)
         warning: '#f59e0b',
         danger: '#ef4444',
         border: "hsl(var(--border))",

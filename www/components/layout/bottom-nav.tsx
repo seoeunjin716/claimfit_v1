@@ -6,22 +6,32 @@ import { usePathname } from "next/navigation"
 import { clsx } from "clsx"
 import { 
   Home, 
-  ClipboardList, 
-  MessageSquare, 
-  Users, 
+  MessageSquare,
+  FileText, 
+  Scale, 
   UserCircle 
 } from "lucide-react"
 
 const navItems = [
   { href: "/", label: "홈", icon: Home },
-  { href: "/requests", label: "의뢰", icon: ClipboardList },
-  { href: "/chat", label: "채팅", icon: MessageSquare },
-  { href: "/community", label: "커뮤니티", icon: Users },
-  { href: "/profile", label: "마이", icon: UserCircle },
+  { href: "/consult", label: "상담", icon: MessageSquare },
+  { href: "/requests", label: "의뢰", icon: FileText },
+  { href: "/cases", label: "판례", icon: Scale },
+  { href: "/profile", label: "프로필", icon: UserCircle },
 ]
 
 export function BottomNav() {
   const pathname = usePathname()
+
+  // 로그인/온보딩/스플래시/의뢰 신청 화면에서는 네비게이션 숨김
+  if (
+    pathname?.startsWith("/login") ||
+    pathname?.startsWith("/onboarding") ||
+    pathname?.startsWith("/splash") ||
+    pathname?.startsWith("/requests/new")
+  ) {
+    return null
+  }
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border safe-area-bottom">
@@ -36,7 +46,7 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               className={clsx(
-                "flex flex-col items-center justify-center flex-1 h-full transition-colors",
+                "flex flex-col items-center justify-center flex-1 h-full transition-colors min-w-[48px]",
                 isActive
                   ? "text-primary-500"
                   : "text-muted-foreground hover:text-foreground"

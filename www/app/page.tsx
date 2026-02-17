@@ -1,150 +1,219 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { EmptyState } from "@/components/ui/empty-state"
-import { RefreshCw, Filter } from "lucide-react"
+import { Star, TrendingUp, FileText, Scale, Upload, MessageSquare, FileCheck, Search } from "lucide-react"
 import Link from "next/link"
 
 // 샘플 데이터
-const sampleRequests = [
+const expertProfile = {
+  name: "김고수",
+  photo: "👨‍💼",
+  increaseRate: "180%",
+  successCases: 247,
+  rating: 4.9,
+}
+
+const quickActions = [
   {
     id: 1,
-    type: "car",
-    typeLabel: "자동차",
-    location: "서울시 강남구",
-    injury: "경증",
-    timeAgo: "5분 전",
-    estimatedAmount: "500만원",
+    title: "의뢰 신청하기",
+    description: "사고 정보 입력",
+    icon: FileText,
+    href: "/requests",
+    color: "text-primary-500",
   },
   {
     id: 2,
-    type: "medical",
-    typeLabel: "실손",
-    location: "경기도 성남시",
-    injury: "중증",
-    timeAgo: "12분 전",
-    estimatedAmount: "1,200만원",
+    title: "판례 검색",
+    description: "법률 자문 확인",
+    icon: Scale,
+    href: "/cases",
+    color: "text-[#16A34A]",
   },
   {
     id: 3,
-    type: "fire",
-    typeLabel: "화재",
-    location: "인천시 남동구",
-    injury: "경증",
-    timeAgo: "23분 전",
-    estimatedAmount: "800만원",
+    title: "증권 제출 확인",
+    description: "자료 관리",
+    icon: Upload,
+    href: "/requests",
+    color: "text-primary-500",
   },
   {
     id: 4,
-    type: "car",
-    typeLabel: "자동차",
-    location: "부산시 해운대구",
-    injury: "사망",
-    timeAgo: "1시간 전",
-    estimatedAmount: "3,000만원",
+    title: "AI 상담 먼저",
+    description: "빠른 상담 시작",
+    icon: MessageSquare,
+    href: "/consult",
+    color: "text-[#16A34A]",
   },
 ]
 
-const injuryColors: Record<string, string> = {
-  경증: "success",
-  중증: "warning",
-  사망: "destructive",
-}
-
 export default function Home() {
-  const [requests] = useState(sampleRequests)
-  const [showFilters, setShowFilters] = useState(false)
+  const router = useRouter()
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(true)
+
+  useEffect(() => {
+    // 로그인 체크
+    const token = localStorage.getItem("auth_token")
+    if (!token) {
+      router.push("/login")
+      return
+    }
+
+    // 온보딩 체크
+    const seen = localStorage.getItem("has_seen_onboarding")
+    if (seen !== "true") {
+      router.push("/onboarding")
+    }
+    setHasSeenOnboarding(seen === "true")
+  }, [router])
+
+  const handleQuickConsult = () => {
+    const token = localStorage.getItem("auth_token")
+    if (!token) {
+      if (confirm("손해사정사와 상담하려면 로그인해주세요.")) {
+        router.push("/login")
+      }
+      return
+    }
+    router.push("/consult")
+  }
 
   return (
-    <main className="min-h-screen bg-background pb-20">
-      {/* 헤더 */}
-      <header className="sticky top-0 z-40 bg-card border-b border-border safe-area-top">
-        <div className="max-w-md mx-auto px-4 py-3">
-          <h1 className="text-title font-bold text-foreground">새 의뢰</h1>
-        </div>
-      </header>
+    <main className="min-h-screen bg-[#F9FAFB] pb-20">
+      <div className="max-w-md mx-auto px-5">
+        {/* 상단 40% 영역 - 손해사정사 브랜딩 집중 */}
+        <div className="pt-10 pb-8">
+          <Card className="rounded-xl shadow-sm border-0 bg-white">
+            <CardContent className="p-8 text-center">
+              {/* 원형 프로필 사진 */}
+              <div className="flex justify-center mb-6">
+                <div className="w-24 h-24 bg-[#F9FAFB] rounded-full flex items-center justify-center text-5xl border-2 border-[#E5E7EB]">
+                  {expertProfile.photo}
+                </div>
+              </div>
 
-      {/* 필터 */}
-      <div className="max-w-md mx-auto px-4 py-3">
-        <div className="flex items-center gap-2 overflow-x-auto pb-2">
+              {/* 이름 */}
+              <h2 className="text-[28px] font-bold text-[#1F2937] mb-3 leading-[1.2]">
+                {expertProfile.name}
+              </h2>
+
+              {/* 뱃지 */}
+              <div className="mb-6">
+                <Badge className="bg-[#F3F4F6] text-[#4B5563] text-xs font-normal px-3 py-1 border-0">
+                  직접 수임 · 개인 운영
+                </Badge>
+              </div>
+
+              {/* 주요 지표 (가로 2열) */}
+              <div className="flex justify-center gap-8 mb-6">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-[#16A34A] mb-1">
+                    {expertProfile.increaseRate}
+                  </div>
+                  <div className="text-sm text-[#6B7280]">평균 증액률</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-[#1F2937] mb-1">
+                    {expertProfile.successCases}건
+                  </div>
+                  <div className="text-sm text-[#6B7280]">성공 케이스</div>
+                </div>
+              </div>
+
+              {/* 슬로건 */}
+              <p className="text-base text-[#4B5563] leading-[1.5] mt-6">
+                모두의 사정을 말해주세요.<br />
+                각각 사정에 맞는 손해사정 서비스를 제공합니다.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* 중앙 30% 영역 - 즉시 행동 유도 */}
+        <div className="mb-8">
+          {/* 빠른 상담 시작 버튼 */}
           <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex-shrink-0"
+            onClick={handleQuickConsult}
+            className="w-full h-14 text-base font-semibold rounded-xl bg-[#2563EB] hover:bg-[#1d4ed8] text-white mb-2"
           >
-            <Filter className="w-4 h-4 mr-1" />
-            필터
+            빠른 상담 시작
           </Button>
-          <Button variant="outline" size="sm" className="flex-shrink-0">
-            전체 지역
-          </Button>
-          <Button variant="outline" size="sm" className="flex-shrink-0">
-            전체 유형
-          </Button>
-          <Button variant="outline" size="sm" className="flex-shrink-0">
-            긴급도
-          </Button>
+          <p className="text-center text-sm text-[#6B7280] mb-8">
+            AI로 먼저 상담받고 손해사정사와 연결
+          </p>
+
+          {/* 기능 바로가기 카드 그룹 (2열 그리드) */}
+          <div className="grid grid-cols-2 gap-3">
+            {quickActions.map((action) => {
+              const Icon = action.icon
+              return (
+                <Link key={action.id} href={action.href}>
+                  <Card className="rounded-lg bg-white shadow-sm border-0 hover:shadow-md transition-shadow cursor-pointer h-full">
+                    <CardContent className="p-6 text-center flex flex-col justify-start pt-6">
+                      <div className={`flex justify-center mb-3 ${action.color}`}>
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      <h3 className="text-sm font-medium text-[#1F2937] mb-1">
+                        {action.title}
+                      </h3>
+                      <p className="text-xs text-[#6B7280] leading-[1.4]">
+                        {action.description}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              )
+            })}
+          </div>
         </div>
-      </div>
 
-      {/* 의뢰 목록 */}
-      <div className="max-w-md mx-auto px-4 space-y-3 pb-4">
-        {requests.length === 0 ? (
-          <EmptyState
-            title="새 의뢰가 없습니다"
-            description="새로운 의뢰가 등록되면 여기에 표시됩니다"
-          />
-        ) : (
-          requests.map((request) => (
-            <Link key={request.id} href={`/requests/${request.id}`} className="block"> {/* ← className="block" 추가 */}
-              <Card className="hover:shadow-md transition-shadow">
-              <CardContent className="p-5"> {/* 패딩을 4에서 5 정도로 살짝 늘려보세요 */}
-                <div className="flex items-start justify-between mb-4 mt-1"> {/* mt-1 추가로 천장에서 살짝 떼기 */}
-                  <div className="flex items-center gap-2">
-                      <Badge variant={request.type as any}>
-                        {request.typeLabel}
-                      </Badge>
-                      <Badge variant={injuryColors[request.injury] as any}>
-                        {request.injury}
-                      </Badge>
-                    </div>
-                    <span className="text-caption text-muted-foreground">
-                      {request.timeAgo}
-                    </span>
+        {/* 하단 30% 영역 - 신뢰 지표 & 보조 콘텐츠 */}
+        <div className="mb-6">
+          {/* 통계 한 줄 카드 (가로 3열) */}
+          <Card className="rounded-lg bg-white shadow-sm border-0 mb-6">
+            <CardContent className="p-6 flex flex-col justify-start pt-6">
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <div className="text-2xl font-bold text-[#1F2937] mb-1">
+                    {expertProfile.successCases}건
                   </div>
-
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-body text-foreground">
-                        📍 {request.location}
-                      </span>
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      예상 보상액: {request.estimatedAmount}
-                    </div>
+                  <div className="text-xs text-[#6B7280]">성공 케이스</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-[#16A34A] mb-1">
+                    {expertProfile.increaseRate}
                   </div>
+                  <div className="text-xs text-[#6B7280]">평균 증액률</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-[#1F2937] mb-1 flex items-center justify-center gap-1">
+                    {expertProfile.rating}
+                    <Star className="w-4 h-4 fill-[#F59E0B] text-[#F59E0B]" />
+                  </div>
+                  <div className="text-xs text-[#6B7280]">평균 평점</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-                  <Button className="w-full" size="lg">
-                    수락하기
-                  </Button>
-                </CardContent>
-              </Card>
-            </Link>
-          ))
-        )}
+          {/* "손해사정사가 책임집니다" 문구 카드 */}
+          <Card className="rounded-lg bg-[#EFF6FF] border-0">
+            <CardContent className="p-6 text-center flex flex-col justify-start pt-6">
+              <p className="text-base text-[#1F2937] leading-[1.5]">
+                전문가가 직접 상담하고 보상을 책임집니다
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* 하단 여백 */}
+        <div className="h-6" />
       </div>
-
-      {/* FAB */}
-      <button
-        className="fixed bottom-24 right-4 w-14 h-14 bg-primary-500 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-primary-600 active:bg-primary-700 transition-colors z-40"
-        aria-label="의뢰 새로고침"
-      >
-        <RefreshCw className="w-6 h-6" />
-      </button>
     </main>
   )
 }
