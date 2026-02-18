@@ -499,7 +499,7 @@ export default function RequestDetailPage() {
                     ? "warning"
                     : policyStatus === "제출 완료"
                     ? "default"
-                    : "danger"
+                    : "destructive"
                 }
                 className="text-xs"
               >

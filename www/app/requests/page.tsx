@@ -88,7 +88,7 @@ export default function RequestsPage() {
       </div>
 
 {/* 컨텐츠 영역 */}
-<div className="max-w-md mx-auto px-4 flex flex-col min-h-[calc(100vh-120px)]"> 
+<div className="max-w-md mx-auto px-4 flex flex-col min-h-[calc(100vh-120px)] pt-6"> 
   {/* flex flex-col: 수직 구조 생성
       min-h-[calc(100vh-120px)]: 화면 전체 높이에서 탭 높이를 뺀 만큼 차지하여 중앙 정렬 기반 마련
   */}
@@ -118,7 +118,7 @@ export default function RequestsPage() {
 
 
         {activeTab === "progress" && (
-          <div className="space-y-5">
+          <div className="space-y-6">
             {sampleRequests.progress.length === 0 ? (
               <EmptyState
                 title="진행 중인 의뢰가 없습니다"
@@ -164,7 +164,7 @@ export default function RequestsPage() {
         )}
 
         {activeTab === "completed" && (
-          <div className="space-y-5">
+          <div className="space-y-6">
             {sampleRequests.completed.length === 0 ? (
               <EmptyState
                 title="완료된 의뢰가 없습니다"

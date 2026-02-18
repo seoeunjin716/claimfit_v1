@@ -329,7 +329,7 @@ export default function ConsultPage() {
                 message.sender === "user"
                   ? "bg-primary-500 text-white"
                   : message.sender === "expert"
-                  ? "bg-success/10 text-foreground border border-success/20"
+                  ? "bg-purple-50 text-purple-900 border border-purple-100 rounded-tl-none"
                   : "bg-muted text-foreground"
               }`}
             >

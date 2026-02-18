@@ -1,93 +1,151 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronRight, TrendingUp, ShieldCheck, Users, Sparkles } from "lucide-react";
 
 const onboardingSlides = [
   {
-    title: "손해사정사의 실제 성공 사례를 먼저 보세요",
-    description: "다양한 사고 유형별 증액 사례를 확인하고, 나의 케이스와 비교해보세요.",
-    icon: "📊",
+    title: "최신 판례와 전문가의\n법률 자문을 확인하세요",
+    description: "내 사고와 유사한 판례 데이터를 검색하고,\n전문적인 법률 검토 결과를 미리 확인해보세요.",
+    color: "bg-blue-50/50",
+    accent: "text-blue-600",
+    icon: <TrendingUp className="w-10 h-10" />, // 크기 축소 (w-20 -> w-10)
   },
   {
-    title: "간단 상담으로 시작하고 손해사정사와 연결",
-    description: "AI 챗봇으로 빠르게 상담받고, 필요시 손해사정사에게 직접 연결됩니다.",
-    icon: "💬",
+    title: "전문가와 함께하는\n든든한 권리 찾기",
+    description: "검증된 손해사정사들이 당신의 편에서\n가장 정당한 보상을 받을 수 있도록 도와드립니다.",
+    color: "bg-indigo-50/50",
+    accent: "text-indigo-600",
+    icon: <ShieldCheck className="w-10 h-10" />,
   },
   {
-    title: "의뢰 신청 → 빠른 계약 → 보상 증액",
-    description: "간편한 의뢰 신청부터 계약, 그리고 보상 증액까지 한 번에 처리하세요.",
-    icon: "🚀",
+    title: "1:1 맞춤 상담으로\n빠르고 정확하게",
+    description: "어려운 용어와 복잡한 절차는 잊으세요.\n채팅으로 간편하게 전문가의 조언을 듣습니다.",
+    color: "bg-emerald-50/50",
+    accent: "text-emerald-600",
+    icon: <Users className="w-10 h-10" />,
   },
-]
+  {
+    title: "이제 정당한 보상을\n받을 준비가 되셨나요?",
+    description: "수많은 사용자가 경험한 신뢰의 서비스,\n지금 바로 첫 걸음을 시작해보세요.",
+    color: "bg-slate-50",
+    accent: "text-slate-900",
+    icon: <Sparkles className="w-10 h-10" />,
+  },
+];
 
 export default function OnboardingPage() {
-  const router = useRouter()
-  const [currentSlide, setCurrentSlide] = useState(0)
-
-  const handleNext = () => {
-    if (currentSlide < onboardingSlides.length - 1) {
-      setCurrentSlide(currentSlide + 1)
-    } else {
-      handleComplete()
-    }
-  }
-
-  const handleSkip = () => {
-    handleComplete()
-  }
+  const router = useRouter();
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   const handleComplete = () => {
-    localStorage.setItem("has_seen_onboarding", "true")
-    router.push("/")
-  }
+    localStorage.setItem("has_seen_onboarding", "true");
+    window.location.href = "/"; 
+  };
+
+  const nextSlide = () => {
+    if (currentSlide < onboardingSlides.length - 1) {
+      setCurrentSlide((prev) => prev + 1);
+    } else {
+      handleComplete();
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* 스킵 버튼 */}
-      <div className="flex justify-end p-4">
-        <Button variant="ghost" size="sm" onClick={handleSkip}>
-          건너뛰기
-        </Button>
+    <div className={`min-h-[100dvh] flex flex-col transition-colors duration-700 ease-in-out ${onboardingSlides[currentSlide].color}`}>
+      
+      {/* 상단 바 */}
+      <div className="flex justify-end p-6 h-16">
+        {currentSlide < onboardingSlides.length - 1 && (
+          <button
+            onClick={handleComplete}
+            className="text-[14px] font-medium text-slate-400 hover:text-slate-600 transition-colors"
+          >
+            건너뛰기
+          </button>
+        )}
       </div>
 
-      {/* 슬라이드 컨텐츠 */}
-      <div className="flex-1 flex items-center justify-center px-6">
-        <Card className="w-full max-w-sm">
-          <CardContent className="p-8 text-center space-y-6">
-            <div className="text-6xl mb-4">{onboardingSlides[currentSlide].icon}</div>
-            <h2 className="text-2xl font-bold text-foreground">
+      {/* 메인 콘텐츠 영역 */}
+      <div className="flex-1 relative flex items-center justify-center overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentSlide}
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -30 }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
+            className="absolute inset-0 flex flex-col items-center justify-center px-10 text-center"
+          >
+            {/* 아이콘 컨테이너: 크기를 w-48에서 w-24로 축소하여 세련미 강조 */}
+            <motion.div 
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              className={`w-24 h-24 rounded-[2rem] bg-white flex items-center justify-center mb-10 shadow-lg shadow-slate-200/40 ${onboardingSlides[currentSlide].accent}`}
+            >
+              {onboardingSlides[currentSlide].icon}
+            </motion.div>
+
+            {/* 타이틀: 28px -> 24px로 조정하여 가독성 확보 */}
+            <h2 className="text-[24px] font-bold text-slate-900 whitespace-pre-line leading-[1.35] mb-4 tracking-tight">
               {onboardingSlides[currentSlide].title}
             </h2>
-            <p className="text-body text-muted-foreground">
+            
+            {/* 설명문: 18px -> 15px로 조정 */}
+            <p className="text-slate-500 text-[15px] whitespace-pre-line leading-relaxed break-keep font-medium opacity-90">
               {onboardingSlides[currentSlide].description}
             </p>
-          </CardContent>
-        </Card>
+          </motion.div>
+        </AnimatePresence>
       </div>
 
-      {/* 인디케이터 */}
-      <div className="flex justify-center gap-2 mb-8">
-        {onboardingSlides.map((_, index) => (
-          <div
-            key={index}
-            className={`h-2 rounded-full transition-all ${
-              index === currentSlide
-                ? "w-8 bg-primary-500"
-                : "w-2 bg-muted"
-            }`}
-          />
-        ))}
-      </div>
+        {/* 하단 컨트롤러: 버튼을 더 크고 강조되게 수정 */}
+        <div className="px-6 pb-14 space-y-10"> {/* 바닥 여백을 더 확보 (pb-12 -> pb-14) */}
+        
+        {/* 인디케이터 (Dots) */}
+        <div className="flex justify-center gap-2">
+          {onboardingSlides.map((_, index) => (
+            <motion.div
+              key={index}
+              initial={false}
+              animate={{
+                width: index === currentSlide ? 32 : 8,
+                backgroundColor: index === currentSlide ? "#0f172a" : "#cbd5e1",
+              }}
+              className="h-2 rounded-full transition-all duration-300"
+            />
+          ))}
+        </div>
 
-      {/* 다음/시작하기 버튼 */}
-      <div className="px-6 pb-8">
-        <Button onClick={handleNext} className="w-full h-14 text-base">
-          {currentSlide === onboardingSlides.length - 1 ? "시작하기" : "다음"}
-        </Button>
+        {/* 액션 버튼: 높이와 둥글기, 그림자를 대폭 강화 */}
+        <button
+          onClick={nextSlide}
+          style={{ height: '36px' }} // 높이를 72px로 강제 고정 (매우 시원해짐)
+          className="
+            w-full
+            bg-[#0f172a] 
+            text-white 
+            rounded-[20px] 
+            text-[16px]       /* 글자 크기를 더 키워 시인성 확보 */
+            font-bold 
+            flex items-center justify-center gap-3 
+            active:scale-[0.97] 
+            transition-all 
+            shadow-[0_10px_25px_-5px_rgba(15,23,42,0.2)]
+          "
+        >
+          {currentSlide === onboardingSlides.length - 1 ? (
+            "지금 바로 시작하기"
+          ) : (
+            <>
+              다음
+              <ChevronRight className="w-6 h-6 stroke-[2.5]" /> {/* 아이콘도 더 선명하게 */}
+            </>
+          )}
+        </button>
       </div>
     </div>
-  )
+  );
 }
